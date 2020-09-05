@@ -2,7 +2,8 @@ import React from "react";
 import * as _ from "lodash";
 import * as Icons from '../icons/index'
 import { IconPickerSearch } from "./icon-picker-search";
-
+import TextBox from 'devextreme-react/text-box';
+import Highlighter from "react-highlight-words";
 
 export class IconOption {
     source: string;
@@ -45,6 +46,11 @@ export const IconPicker: React.FunctionComponent<React.SVGProps<SVGSVGElement>> 
 
     iconOptions = _.sortBy(iconOptions, [(o) => o.name]);
 
+    const [filteredIcons, setIcons] = React.useState(iconOptions);
+
+    const [searchTerm, setSearchTerm] = React.useState("");
+
+
     function getReadableName(name: string): string {
         var result = name.replace(/([A-Z])/g, " $1");
         var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
@@ -52,12 +58,28 @@ export const IconPicker: React.FunctionComponent<React.SVGProps<SVGSVGElement>> 
         return finalResult;
     }
 
+    function getHighlightedText(text: string, highlight: string) {
+        // Split text on highlight term, include term itself into parts, ignore case
+        const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+        return <span>{parts.map(part => part.toLowerCase() === highlight.toLowerCase() ? <b>{part}</b> : part)}</span>;
+    }
+
+    function updateGrid(event: any) {
+
+        setSearchTerm(event.event.target.value.toLowerCase());
+        //setIcons(_.filter(iconOptions, (o) =>  o.name.toLowerCase().includes(event.value.toLowerCase())));
+        setIcons(_.filter(iconOptions, (o) => o.name.toLowerCase().includes(event.event.target.value.toLowerCase())));
+    }
+
     return (
-        <>
-            <IconPickerSearch iconOptions={iconOptions} />
-            <div className="icon-picker bg-indigo-300">
+        <div className="h-full">
+            <div className="p-4 bg-blue-800">
+                <TextBox onInput={updateGrid} placeholder="Search icons..." />
+            </div>
+
+            <div className="icon-picker bg-indigo-300 h-full">
                 {
-                    iconOptions.map(
+                    filteredIcons.map(
                         iconOption => (
                             <div key={iconOption.source + '-' + iconOption.name} className="icon-selection inline-block rounded overflow-hidden shadow-lg bg-white m-1 hover:bg-blue-100 cursor-pointer">
                                 <div className="icon-wrapper px-2 py-2 text-center">
@@ -65,7 +87,15 @@ export const IconPicker: React.FunctionComponent<React.SVGProps<SVGSVGElement>> 
 
                                     <iconOption.Component {...props} />
                                     <div className="text-wrapper">
-                                        <div className="icon-text">{getReadableName(iconOption.name)}</div>
+                                        {/* <div className="icon-text">{iconOption.name}</div>
+                                        <div className="icon-text">{getHighlightedText(iconOption.name, searchTerm)}</div> */}
+                                        <Highlighter
+                                        className="icon-text"
+                                        highlightClassName="bg-yellow-200"
+                                        searchWords={[searchTerm]}
+                                        autoEscape={true}
+                                        textToHighlight={iconOption.name}
+                                    />
                                     </div>
 
 
@@ -76,7 +106,7 @@ export const IconPicker: React.FunctionComponent<React.SVGProps<SVGSVGElement>> 
                     )
                 }
             </div>
-        </>
+        </div>
     );
 }
 

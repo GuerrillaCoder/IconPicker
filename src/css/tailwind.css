@@ -4,4 +4,7 @@
 
 @import "tailwindcss/utilities";
 
-@import 'antd/dist/antd.css';
+/* @import 'antd/dist/antd.css'; */
+
+@import 'devextreme/dist/css/dx.common';
+@import 'devextreme/dist/css/dx.light';

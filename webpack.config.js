@@ -1,5 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = [
   {
@@ -47,9 +48,16 @@ module.exports = [
         filename: '[name].css',
         // chunkFilename: '[name].css',
       }),
+      new CopyPlugin({
+        patterns: [
+          { from: 'node_modules/devextreme/dist/css/icons', to: 'dist/icons' },
+          // { from: 'node_modules/devextreme/dist/css/fonts', to: 'dist/fonts' },
+          // { from: 'node_modules/devextreme/dist/css/icons', to: 'src/css/icons' },
+          // { from: 'node_modules/devextreme/dist/css/fonts', to: 'src/css/fonts' },
+        ]})
     ],
     module: {
-
+      
       rules: [
         {
           test: /\.css$/,
@@ -75,6 +83,18 @@ module.exports = [
             }
           ],
         },
+        {
+          test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]',
+                outputPath: 'fonts/'
+              }
+            }
+          ]
+        }
       ],
     },
     output: {
